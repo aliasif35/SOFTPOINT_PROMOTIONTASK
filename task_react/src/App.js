@@ -25,20 +25,20 @@ function  App (){
 
   const [tabValue, settabValue]=useState(0)
   const [promotions, setPromotions]=useState(JSON.parse(localStorage.getItem('sp_promotions')) != null ? JSON.parse(localStorage.getItem('sp_promotions')):[])
-  const [callApi, setCallApi]=useState(promotions.length==0?true:false)
+  const[apiCall,setApiCall]=useState(promotions.length==0?true:false)
  
   const handleChange = (event, newValue) => {
     settabValue(newValue)
   }
   useEffect(() => {
-   
-    if(callApi){
-      console.log('proooo',promotions)
+    console.log(promotions.length, apiCall)
+   if(promotions.length==0 && apiCall){
+    setApiCall(false)
     axios
       .get(
         "https://run.mocky.io/v3/484016a8-3cdb-44ad-97db-3e5d20d84298"       
       )
-      .then((response) => {
+      .then((response) => {     
       localStorage.setItem('sp_promotions', JSON.stringify(response.data))
       setPromotions(response.data)
       })
@@ -49,6 +49,7 @@ function  App (){
         var element = arr[fromIndex];
         arr.splice(fromIndex, 1);
         arr.splice(toIndex, 0, element);
+        setPromotions(arr)
         localStorage.setItem('sp_promotions', JSON.stringify(arr))
     }
  const getChangedPos = (currentPos, newPos) => {
@@ -56,6 +57,7 @@ function  App (){
   };
      
     return (
+      promotions.length>0?(
       <>
       <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed">
@@ -91,10 +93,10 @@ function  App (){
             </TabList>            
             <TabPanel value={0}>
             <Draggable onPosChange={getChangedPos}>
-            {promotions != null?(            
+            {promotions.length>0 ?(            
               promotions.map((s, index) => {
               return (
-                <div>
+                <div className="promotionsTask">
                 <Card sx={{ maxWidth: 500, marginBottom:"50px"}}>
                 <CardMedia
                   component="img"
@@ -120,10 +122,10 @@ function  App (){
               
             </TabPanel>
             <TabPanel value={1}>
-            {promotions != null?(            
+            {promotions.length>0?(            
               promotions.map((s, index) => ( 
                 s.onlyNewCustomers?(             
-                <Card sx={{ maxWidth: 500, marginBottom:"50px"}}>
+                <Card className="promotionsTask" sx={{ maxWidth: 500, marginBottom:"50px"}}>
                 <CardMedia
                   component="img"
                   height="140"
@@ -151,10 +153,9 @@ function  App (){
             
       </TabContext>
       </Grid>    
-      </>
+      </>):<></>
     );
   
 }
 
 export default App;
-ReactDOM.render(<App />, document.getElementById("root"));
